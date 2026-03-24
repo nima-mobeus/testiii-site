@@ -187,7 +187,22 @@ reg('timeline-card', () => import('./TimelineCard'));
  * Returns undefined if no matching component is registered.
  */
 export function getComponent(type: string): ComponentType<TeleComponentProps> | undefined {
-  return registry[type];
+  if (!type || typeof type !== 'string') return undefined;
+
+  // Exact match
+  if (registry[type]) return registry[type];
+
+  // Case-insensitive fallback
+  const lower = type.toLowerCase();
+  for (const key of Object.keys(registry)) {
+    if (key.toLowerCase() === lower) return registry[key];
+  }
+
+  // kebab-case → PascalCase: "hero-split" → "HeroSplit"
+  const pascal = type.replace(/(^|-)([a-z])/g, (_, __, c) => c.toUpperCase());
+  if (registry[pascal]) return registry[pascal];
+
+  return undefined;
 }
 
 /**

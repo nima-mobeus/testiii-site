@@ -13,7 +13,14 @@ import { TeleComponentProps } from './types';
  */
 export default function ColorPicker({ data, accentColor = '#2563eb', onAction }: TeleComponentProps) {
   const title = data.title as string | undefined;
-  const colors = Array.isArray(data.colors) ? (data.colors as string[]) : [];
+  const rawColors = Array.isArray(data.colors) ? data.colors : [];
+  // Handle both string[] and {name, hex}[] formats from LLM
+  const colors = rawColors.map((c: unknown) =>
+    typeof c === 'string' ? c : (c && typeof c === 'object' && 'hex' in c) ? (c as { hex: string }).hex : String(c)
+  );
+  const colorLabels = rawColors.map((c: unknown) =>
+    typeof c === 'string' ? c : (c && typeof c === 'object' && 'name' in c) ? (c as { name: string }).name : undefined
+  );
   const selectedColor = data.selectedColor as string | undefined;
   const columns = (data.columns as number) ?? 5;
 
@@ -37,7 +44,7 @@ export default function ColorPicker({ data, accentColor = '#2563eb', onAction }:
                 borderColor: isSelected ? accentColor : 'transparent',
                 boxShadow: isSelected ? `0 0 0 2px ${accentColor}` : undefined,
               }}
-              title={color}
+              title={colorLabels[i] || color}
               onClick={() => onAction?.(`Selected color: ${color}`)}
             />
           );

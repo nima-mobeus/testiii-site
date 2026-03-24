@@ -14,6 +14,7 @@ export function SceneManager() {
   const avatarVideoTrack = useVoiceSessionStore((s) => s.avatarVideoTrack);
   const avatarEnabled = useVoiceSessionStore((s) => s.avatarEnabled);
   const avatarVisible = useVoiceSessionStore((s) => s.avatarVisible);
+  const skeletonLayout = useVoiceSessionStore((s) => s.skeletonLayout);
 
   // Get GridView component from registry
   const GridView = useMemo(() => getComponent('GridView'), []);
@@ -25,7 +26,8 @@ export function SceneManager() {
     [tellAgent]
   );
 
-  if (!sceneActive || !currentScene) return null;
+  if (!sceneActive) return null;
+  if (!currentScene && !skeletonLayout) return null;
 
   const hasHistory = sceneHistory.length > 1;
 
@@ -116,9 +118,11 @@ export function SceneManager() {
         </div>
       )}
 
-      {/* Main content - GridView */}
+      {/* Main content - GridView or Skeleton */}
       <main className="relative z-10 flex-1 px-6 pb-4 overflow-auto min-h-0">
-        {GridView && currentScene.cards && currentScene.cards.length > 0 ? (
+        {skeletonLayout ? (
+          <SceneSkeleton layout={skeletonLayout} />
+        ) : GridView && currentScene?.cards && currentScene.cards.length > 0 ? (
           <Suspense
             fallback={
               <div className="animate-pulse h-full bg-white/5 rounded-xl" />
@@ -142,12 +146,73 @@ export function SceneManager() {
       </main>
 
       {/* Footer */}
-      {(currentScene.footerLeft || currentScene.footerRight) && (
+      {currentScene?.footerLeft || currentScene?.footerRight ? (
         <footer className="relative z-10 flex items-center justify-between px-6 py-3 text-xs text-white/40 shrink-0">
           <span>{currentScene.footerLeft || ''}</span>
           <span>{currentScene.footerRight || ''}</span>
         </footer>
-      )}
+      ) : null}
+    </div>
+  );
+}
+
+/** Skeleton loading grid — shows shimmer cards matching the layout */
+function SceneSkeleton({ layout }: { layout: string }) {
+  const rows = layout.includes('x')
+    ? (() => {
+        const [cols, rowCount] = layout.split('x').map(Number);
+        return Array(rowCount).fill(cols);
+      })()
+    : layout.split('-').map(Number);
+
+  return (
+    <div className="h-full flex flex-col gap-3">
+      {rows.map((colCount, rowIdx) => (
+        <div
+          key={rowIdx}
+          className="flex-1 grid gap-3"
+          style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
+        >
+          {Array(colCount)
+            .fill(0)
+            .map((_, colIdx) => {
+              const delay = `${(rowIdx * colCount + colIdx) * 120}ms`;
+              return (
+                <div
+                  key={colIdx}
+                  className="rounded-xl animate-skeleton-bounce skeleton-shimmer-bg"
+                  style={{
+                    minHeight: rowIdx === 0 ? '60px' : '120px',
+                    animationDelay: delay,
+                  }}
+                >
+                  <div className="p-4 space-y-3">
+                    <div
+                      className="h-3 rounded-full w-1/3"
+                      style={{ background: 'rgba(255,255,255,0.12)', animationDelay: delay }}
+                    />
+                    <div
+                      className="h-2 rounded-full w-2/3"
+                      style={{ background: 'rgba(255,255,255,0.08)', animationDelay: `calc(${delay} + 80ms)` }}
+                    />
+                    {rowIdx > 0 && (
+                      <>
+                        <div
+                          className="h-2 rounded-full w-1/2"
+                          style={{ background: 'rgba(255,255,255,0.06)', animationDelay: `calc(${delay} + 160ms)` }}
+                        />
+                        <div
+                          className="h-8 rounded-lg w-full mt-2"
+                          style={{ background: 'rgba(255,255,255,0.05)', animationDelay: `calc(${delay} + 240ms)` }}
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+      ))}
     </div>
   );
 }

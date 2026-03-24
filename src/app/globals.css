@@ -290,6 +290,34 @@ body {
   container-type: inline-size;
 }
 
+/* ── Skeleton Bounce ── */
+@keyframes skeleton-bounce {
+  0%   { transform: translateY(0px) scale(1);     opacity: 0.55; }
+  30%  { transform: translateY(-5px) scale(1.01); opacity: 0.75; }
+  60%  { transform: translateY(2px) scale(0.99);  opacity: 0.60; }
+  80%  { transform: translateY(-2px) scale(1.005);opacity: 0.70; }
+  100% { transform: translateY(0px) scale(1);     opacity: 0.55; }
+}
+@keyframes skeleton-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.animate-skeleton-bounce {
+  animation: skeleton-bounce 1.8s ease-in-out infinite;
+}
+.skeleton-shimmer-bg {
+  background: linear-gradient(
+    90deg,
+    var(--theme-card-bg, rgba(255,255,255,0.05)) 0%,
+    rgba(255,255,255,0.10) 40%,
+    rgba(255,255,255,0.18) 50%,
+    rgba(255,255,255,0.10) 60%,
+    var(--theme-card-bg, rgba(255,255,255,0.05)) 100%
+  );
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
 /* ── Scene overlay gradient (avatar shows on right) ── */
 .scene-gradient-overlay {
   background: linear-gradient(
