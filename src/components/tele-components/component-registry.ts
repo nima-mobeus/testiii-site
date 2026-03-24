@@ -134,7 +134,7 @@ reg('news-feed', () => import('./NewsFeedCard'));
 // reg('live-map', () => import('./LiveMapCard'));  // DEFERRED: needs react-simple-maps
 
 // Email, Calendar & Travel
-reg('event-card', () => import('./EventCard'));
+reg('color-picker', () => import('./ColorPicker'));
 reg('email-card', () => import('./EmailCard'));
 reg('email-list', () => import('./EmailListCard'));
 reg('trip-card', () => import('./TripCard'));
