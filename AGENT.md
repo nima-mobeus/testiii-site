@@ -6,7 +6,7 @@
 
 ## Architecture Overview
 
-This is a **client website** deployed on the Voice AI Platform. It has a persistent voice overlay powered by LiveKit that lets a voice AI agent control the UI — showing components, navigating pages, and collecting form data.
+This is a **client website** deployed on the Voice AI Platform. It has a persistent voice overlay powered by LiveKit that lets a voice AI agent control the UI — showing components , navigating pages, and collecting form data.
 
 **Key concepts:**
 - The **voice agent** (Python, runs server-side) controls the UI by calling `show_component(templateType, data)`
